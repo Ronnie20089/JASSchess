@@ -17,21 +17,36 @@
             background: #0C090A;
             transition: background 0.5s, color 0.5s;
             cursor: none; /* Hide the default cursor */
+            overflow: hidden; /* Prevent scrollbars */
         }
-        .container {
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             background-color: #171717;
             background-image: radial-gradient(rgba(52, 52, 52, 0.301) 2px, transparent 0);
             background-size: 30px 30px;
-            background-position: -5px -5px;
+            background-position: 0 0;
+            pointer-events: none; /* Prevent interaction */
+            z-index: -1; /* Send it to the back */
+            transition: filter 1.5s; /* Transition for unblurring */
+            filter: blur(5px); /* Initial blur effect */
+        }
+        .background.loaded {
+            filter: blur(0); /* Remove blur when page has loaded */
+        }
+        .container {
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            filter: blur(5px); /* Initial blur effect */
             transition: filter 1.5s; /* Transition for unblurring */
+            filter: blur(5px); /* Initial blur effect */
         }
         .container.loaded {
             filter: blur(0); /* Remove blur when page has loaded */
@@ -160,6 +175,8 @@
         </div>
     </div>
 
+    <div class="background"></div>
+
     <div class="container">
         <h1>Hello</h1>
         <p>Check out this link:</p>
@@ -184,6 +201,7 @@
         const $hoverables = document.querySelectorAll('.hoverable');
         const $checkbox = document.querySelector('#cCB1'); // Get the checkbox element
         const $container = document.querySelector('.container'); // Get the container element
+        const $background = document.querySelector('.background'); // Get the background element
 
         let hideCursorTimeout;
 
@@ -201,6 +219,16 @@
             gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 });
             gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 });
             showCursor();
+
+            // Parallax effect
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            gsap.to($background, {
+                duration: 0.5,
+                x: (mouseX - 0.5) * 10,
+                y: (mouseY - 0.5) * 10,
+                ease: 'power1.out'
+            });
         }
 
         // Show the cursor
@@ -241,6 +269,7 @@
         // Remove blur after page has loaded
         window.addEventListener('load', () => {
             $container.classList.add('loaded');
+            $background.classList.add('loaded');
         });
     </script>
 </body>
