@@ -94,8 +94,13 @@
             $cursor.classList.add('hidden');
         }
 
-        // Listeners
-        document.body.addEventListener('mousemove', onMouseMove);
+        // Initialize cursor
+        function initCursor() {
+            document.body.addEventListener('mousemove', onMouseMove);
+        }
+
+        // Ensure cursor setup runs after page load
+        window.addEventListener('load', initCursor);
     </script>
 </body>
 </html>
