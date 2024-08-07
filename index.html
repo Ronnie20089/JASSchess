@@ -30,6 +30,11 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            filter: blur(5px); /* Initial blur effect */
+            transition: filter 1.5s; /* Transition for unblurring */
+        }
+        .container.loaded {
+            filter: blur(0); /* Remove blur when page has loaded */
         }
         h1, p, a {
             color: inherit;
@@ -178,6 +183,7 @@
         const $cursor = document.querySelector('.cursor');
         const $hoverables = document.querySelectorAll('.hoverable');
         const $checkbox = document.querySelector('#cCB1'); // Get the checkbox element
+        const $container = document.querySelector('.container'); // Get the container element
 
         let hideCursorTimeout;
 
@@ -231,6 +237,11 @@
                 }, 500); // Delay for 0.5 seconds
             }
         }
+
+        // Remove blur after page has loaded
+        window.addEventListener('load', () => {
+            $container.classList.add('loaded');
+        });
     </script>
 </body>
 </html>
