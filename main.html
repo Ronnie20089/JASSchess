@@ -15,6 +15,7 @@
             color: #fff;
             background: #0C090A;
             transition: background 0.5s, color 0.5s;
+            cursor: none; /* Hide the default cursor */
         }
         .container {
             width: 100%;
@@ -23,10 +24,78 @@
             background-image: radial-gradient(rgba(52, 52, 52, 0.301) 2px, transparent 0);
             background-size: 30px 30px;
             background-position: -5px -5px;
+            position: relative; /* Ensure the container is positioned relative to position the cursor */
+        }
+        .cursor {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            mix-blend-mode: difference;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        .cursor.hidden {
+            opacity: 0;
+        }
+        .cursor__ball {
+            position: fixed;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .cursor__ball--big svg circle {
+            fill: rgba(247, 248, 250, 0.7);
+        }
+        .cursor__ball--small svg circle {
+            fill: rgba(247, 248, 250, 0.7);
         }
     </style>
 </head>
 <body>
+    <div class="cursor">
+        <div class="cursor__ball cursor__ball--big">
+            <svg height="30" width="30">
+                <circle cx="15" cy="15" r="12" stroke-width="0"></circle>
+            </svg>
+        </div>
+        <div class="cursor__ball cursor__ball--small">
+            <svg height="10" width="10">
+                <circle cx="5" cy="5" r="4" stroke-width="0"></circle>
+            </svg>
+        </div>
+    </div>
+
     <div class="container"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        const $bigBall = document.querySelector('.cursor__ball--big');
+        const $smallBall = document.querySelector('.cursor__ball--small');
+        const $cursor = document.querySelector('.cursor');
+
+        let hideCursorTimeout;
+
+        // Move the cursor
+        function onMouseMove(e) {
+            gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 });
+            gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 });
+            showCursor();
+        }
+
+        // Show the cursor
+        function showCursor() {
+            $cursor.classList.remove('hidden');
+            clearTimeout(hideCursorTimeout);
+            hideCursorTimeout = setTimeout(hideCursor, 1000); // Hide after 1 second of inactivity
+        }
+
+        // Hide the cursor
+        function hideCursor() {
+            $cursor.classList.add('hidden');
+        }
+
+        // Listeners
+        document.body.addEventListener('mousemove', onMouseMove);
+    </script>
 </body>
 </html>
