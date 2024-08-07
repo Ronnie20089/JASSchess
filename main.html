@@ -17,6 +17,7 @@
             background: #0C090A;
             transition: background 0.5s, color 0.5s;
             cursor: none; /* Hide the default cursor */
+            overflow: hidden; /* Prevent scrollbars */
         }
         .container {
             width: 100%;
@@ -26,6 +27,11 @@
             background-size: 30px 30px;
             background-position: -5px -5px;
             position: relative; /* Ensure the container is positioned relative to position the cursor */
+            transition: filter 1.5s; /* Transition for unblurring */
+            filter: blur(5px); /* Initial blur effect */
+        }
+        .container.loaded {
+            filter: blur(0); /* Remove blur when page has loaded */
         }
         .cursor {
             pointer-events: none;
@@ -34,10 +40,14 @@
             left: 0;
             mix-blend-mode: difference;
             z-index: 1000;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, filter 1.5s; /* Transition for unblurring */
+            filter: blur(5px); /* Initial blur effect */
         }
         .cursor.hidden {
             opacity: 0;
+        }
+        .cursor.loaded {
+            filter: blur(0); /* Remove blur when page has loaded */
         }
         .cursor__ball {
             position: fixed;
@@ -73,6 +83,7 @@
         const $bigBall = document.querySelector('.cursor__ball--big');
         const $smallBall = document.querySelector('.cursor__ball--small');
         const $cursor = document.querySelector('.cursor');
+        const $container = document.querySelector('.container');
 
         let hideCursorTimeout;
 
@@ -81,6 +92,16 @@
             gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 });
             gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 });
             showCursor();
+
+            // Parallax effect
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            gsap.to($container, {
+                duration: 0.5,
+                x: (mouseX - 0.5) * 10,
+                y: (mouseY - 0.5) * 10,
+                ease: 'power1.out'
+            });
         }
 
         // Show the cursor
@@ -101,7 +122,11 @@
         }
 
         // Ensure cursor setup runs after page load
-        window.addEventListener('load', initCursor);
+        window.addEventListener('load', () => {
+            initCursor();
+            $container.classList.add('loaded');
+            $cursor.classList.add('loaded');
+        });
     </script>
 </body>
 </html>
