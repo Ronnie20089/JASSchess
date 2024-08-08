@@ -6,6 +6,7 @@
     <title>JASS Chess</title>
     <link rel="icon" href="ChessLogo.png" type="image/png">
     <style>
+        /* Body styling to center content and set background */
         body {
             height: 100vh;
             margin: 0;
@@ -19,6 +20,8 @@
             cursor: none; /* Hide the default cursor */
             overflow: hidden; /* Prevent scrollbars */
         }
+
+        /* Background styling */
         .background {
             position: absolute;
             top: 0;
@@ -34,9 +37,13 @@
             transition: filter 1.5s; /* Transition for unblurring */
             filter: blur(5px); /* Initial blur effect */
         }
+
+        /* Remove blur when the page has loaded */
         .background.loaded {
-            filter: blur(0); /* Remove blur when page has loaded */
+            filter: blur(0);
         }
+
+        /* Container for centering content */
         .container {
             width: 100%;
             height: 100%;
@@ -48,21 +55,31 @@
             transition: filter 1.5s; /* Transition for unblurring */
             filter: blur(5px); /* Initial blur effect */
         }
+
+        /* Remove blur when the page has loaded */
         .container.loaded {
-            filter: blur(0); /* Remove blur when page has loaded */
+            filter: blur(0);
         }
+
+        /* General text and link styling */
         h1, p, a {
             color: inherit;
         }
+
+        /* Link styling */
         a {
             border-bottom: 2px solid;
             padding: 10px 0;
             margin-top: 50px;
             text-decoration: none; /* Remove underline */
         }
+
+        /* Custom cursor styling */
         .hoverable {
             cursor: none; /* Hide default cursor */
         }
+
+        /* Cursor container styling */
         .cursor {
             pointer-events: none;
             position: absolute;
@@ -72,26 +89,38 @@
             z-index: 1000;
             transition: opacity 0.3s;
         }
+
+        /* Hide cursor when inactive */
         .cursor.hidden {
             opacity: 0;
         }
+
+        /* Ball cursor styling */
         .cursor__ball {
             position: fixed;
             border-radius: 50%;
             transform: translate(-50%, -50%);
         }
+
+        /* Big cursor ball styling */
         .cursor__ball--big svg circle {
             fill: rgba(247, 248, 250, 0.7);
         }
+
+        /* Small cursor ball styling */
         .cursor__ball--small svg circle {
             fill: rgba(247, 248, 250, 0.7);
         }
+
+        /* Custom checkbox holder styling */
         .customCheckBoxHolder {
             position: absolute;
             bottom: 20px;
             right: 20px;
             display: flex;
         }
+
+        /* Custom checkbox button styling */
         .customCheckBox {
             width: fit-content;
             position: relative;
@@ -113,11 +142,15 @@
             justify-content: center;
             min-width: 55px;
         }
+
+        /* Custom checkbox hover effect */
         .customCheckBox:hover {
             background-color: #2c2c2c;
             color: white;
             box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px;
         }
+
+        /* Text inside the custom checkbox */
         .customCheckBox .inner {
             font-size: 18px;
             font-weight: 900;
@@ -127,47 +160,65 @@
             transition-property: transform;
             transform: translateY(0px);
         }
+
+        /* Move text up slightly on hover */
         .customCheckBox:hover .inner {
             transform: translateY(-2px);
         }
+
+        /* Adjust first and last custom checkbox wrappers */
         .customCheckBoxWrapper:first-of-type .customCheckBox {
             border-bottom-left-radius: 5px;
             border-top-left-radius: 5px;
             border-right: 0px;
         }
+
         .customCheckBoxWrapper:last-of-type .customCheckBox {
             border-bottom-right-radius: 5px;
             border-top-right-radius: 5px;
             border-left: 0px;
         }
+
+        /* Hide default checkbox input */
         .customCheckBoxInput {
             display: none;
         }
+
+        /* Checked checkbox styling */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox {
             background-color: #2d6737;
             color: white;
             box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px;
             transform: none; /* Remove scale effect */
         }
+
+        /* Move text up slightly when checked */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox .inner {
             transform: translateY(-2px);
         }
+
+        /* Checked checkbox hover effect */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox:hover {
             background-color: #34723f;
             box-shadow: rgba(0, 0, 0, 0.26) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.15) 0px 3px 6px 2px;
         }
+
+        /* Move text up slightly on hover when checked */
         .customCheckBoxWrapper .customCheckBox:hover .inner {
             transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
+    <!-- Custom cursor markup -->
     <div class="cursor">
+        <!-- Big cursor ball -->
         <div class="cursor__ball cursor__ball--big">
             <svg height="30" width="30">
                 <circle cx="15" cy="15" r="12" stroke-width="0"></circle>
             </svg>
         </div>
+        <!-- Small cursor ball -->
         <div class="cursor__ball cursor__ball--small">
             <svg height="10" width="10">
                 <circle cx="5" cy="5" r="4" stroke-width="0"></circle>
@@ -175,8 +226,10 @@
         </div>
     </div>
 
+    <!-- Background element -->
     <div class="background"></div>
 
+    <!-- Main container for centered content -->
     <div class="container">
         <h1>Hello</h1>
         <p>Check out this link:</p>
@@ -193,8 +246,10 @@
         </div>
     </div>
 
+    <!-- GSAP animation library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script>
+        // Select cursor elements
         const $bigBall = document.querySelector('.cursor__ball--big');
         const $smallBall = document.querySelector('.cursor__ball--small');
         const $cursor = document.querySelector('.cursor');
@@ -205,7 +260,7 @@
 
         let hideCursorTimeout;
 
-        // Listeners
+        // Event listeners for cursor and hover effects
         document.body.addEventListener('mousemove', onMouseMove);
         $hoverables.forEach(element => {
             element.addEventListener('mouseenter', onMouseHover);
@@ -214,13 +269,13 @@
         });
         $checkbox.addEventListener('change', onCheckboxChange); // Add event listener for checkbox
 
-        // Move the cursor
+        // Move the cursor based on mouse position
         function onMouseMove(e) {
             gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 });
             gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 });
             showCursor();
 
-            // Parallax effect
+            // Parallax effect for background
             const mouseX = e.clientX / window.innerWidth;
             const mouseY = e.clientY / window.innerHeight;
             gsap.to($background, {
@@ -243,16 +298,17 @@
             $cursor.classList.add('hidden');
         }
 
-        // Hover an element
+        // Hover effect for elements
         function onMouseHover() {
             gsap.to($bigBall, { duration: 0.3, scale: 4 });
         }
 
+        // Reset cursor on hover out
         function onMouseHoverOut() {
             gsap.to($bigBall, { duration: 0.3, scale: 1 });
         }
 
-        // Mouse down on hoverable
+        // Click effect for hoverable elements
         function onMouseDown() {
             gsap.to($bigBall, { duration: 0.3, scale: 2 });
         }
@@ -266,7 +322,7 @@
             }
         }
 
-        // Remove blur after page has loaded
+        // Remove blur effect when page has loaded
         window.addEventListener('load', () => {
             $container.classList.add('loaded');
             $background.classList.add('loaded');

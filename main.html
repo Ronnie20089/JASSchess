@@ -4,196 +4,248 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JASS-Chess</title>
-    <link rel="icon" href="ChessLogo.png" type="image/png">
+    <link rel="icon" href="ChessLogo.png" type="image/png"> <!-- Favicon for the webpage -->
     <style>
+        /* Basic styles for the body */
         body {
-            height: 100vh;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: monospace;
-            color: #fff;
-            background: #0C090A;
-            transition: background 0.5s, color 0.5s;
+            height: 100vh; /* Full viewport height */
+            margin: 0; /* Remove default margin */
+            display: flex; /* Flexbox layout */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            font-family: monospace; /* Set font */
+            color: #fff; /* Text color */
+            background: #0C090A; /* Background color */
+            transition: background 0.5s, color 0.5s; /* Smooth transitions for background and text color */
             cursor: none; /* Hide the default cursor */
             overflow: hidden; /* Prevent scrollbars */
         }
+
+        /* Container styling */
         .container {
-            width: 100%;
-            height: 100%;
-            background-color: #171717;
-            background-image: radial-gradient(rgba(52, 52, 52, 0.301) 2px, transparent 0);
-            background-size: 30px 30px;
-            background-position: -5px -5px;
-            position: relative; /* Ensure the container is positioned relative to position the cursor */
-            transition: filter 1.5s; /* Transition for unblurring */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background-color: #171717; /* Background color */
+            background-image: radial-gradient(rgba(52, 52, 52, 0.301) 2px, transparent 0); /* Radial gradient background */
+            background-size: 30px 30px; /* Size of the gradient */
+            background-position: -5px -5px; /* Position the gradient */
+            position: relative; /* Positioning for other elements */
+            transition: filter 1.5s; /* Smooth transition for unblurring */
             filter: blur(5px); /* Initial blur effect */
         }
+
+        /* Remove blur when the page has loaded */
         .container.loaded {
-            filter: blur(0); /* Remove blur when page has loaded */
+            filter: blur(0);
         }
+
+        /* Cursor styling */
         .cursor {
-            pointer-events: none;
-            position: absolute;
+            pointer-events: none; /* Disable pointer events */
+            position: absolute; /* Absolute positioning */
             top: 0;
             left: 0;
-            mix-blend-mode: difference;
-            z-index: 1000;
+            mix-blend-mode: difference; /* Blend mode for cursor effect */
+            z-index: 1000; /* Ensure it's on top */
             transition: opacity 0.3s, filter 1.5s; /* Transition for unblurring */
             filter: blur(5px); /* Initial blur effect */
         }
+
+        /* Hide the cursor when needed */
         .cursor.hidden {
             opacity: 0;
         }
+
+        /* Remove blur when the page has loaded */
         .cursor.loaded {
-            filter: blur(0); /* Remove blur when page has loaded */
+            filter: blur(0);
         }
+
+        /* Styling for the cursor balls */
         .cursor__ball {
-            position: fixed;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
+            position: fixed; /* Fixed position */
+            border-radius: 50%; /* Circular shape */
+            transform: translate(-50%, -50%); /* Center the balls */
         }
+
+        /* Styling for the big cursor ball */
         .cursor__ball--big svg circle {
-            fill: rgba(247, 248, 250, 0.7);
+            fill: rgba(247, 248, 250, 0.7); /* Color fill */
         }
+
+        /* Styling for the small cursor ball */
         .cursor__ball--small svg circle {
-            fill: rgba(247, 248, 250, 0.7);
+            fill: rgba(247, 248, 250, 0.7); /* Color fill */
         }
+
+        /* Spline viewer styling */
         spline-viewer {
-            position: absolute;
+            position: absolute; /* Absolute positioning */
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 999; /* Ensure the Spline viewer is in front of other elements */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            z-index: 999; /* Ensure it is in front of other elements */
         }
+
+        /* 3D canvas styling */
         #canvas3d {
-            position: absolute;
+            position: absolute; /* Absolute positioning */
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 998; /* Ensure the canvas is behind the Spline viewer */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            z-index: 998; /* Ensure it is behind the Spline viewer */
         }
+
+        /* Custom checkbox holder styling */
         .customCheckBoxHolder {
-            margin: 5px;
-            display: flex;
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001; /* Ensure the checkbox is in front of other elements */
+            margin: 5px; /* Small margin */
+            display: flex; /* Flexbox layout */
+            position: absolute; /* Absolute positioning */
+            bottom: 20px; /* 20px from the bottom */
+            right: 20px; /* 20px from the right */
+            z-index: 1001; /* Ensure it's on top */
         }
+
+        /* Custom checkbox styling */
         .customCheckBox {
-            width: fit-content;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            user-select: none;
-            padding: 2px 8px;
-            background-color: rgba(0, 0, 0, 0.16);
-            border-radius: 0px;
-            color: rgba(255, 255, 255, 0.7);
-            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
-            transition-duration: 300ms;
-            transition-property: color, background-color, box-shadow;
-            display: flex;
-            height: 32px;
-            align-items: center;
-            box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px 1px 1px 0px;
-            outline: none;
-            justify-content: center;
-            min-width: 55px;
+            width: fit-content; /* Adjust width to content */
+            position: relative; /* Positioning for inner elements */
+            overflow: hidden; /* Hide overflow */
+            cursor: pointer; /* Pointer cursor */
+            user-select: none; /* Disable text selection */
+            padding: 2px 8px; /* Padding inside the checkbox */
+            background-color: rgba(0, 0, 0, 0.16); /* Background color */
+            border-radius: 0px; /* No border radius */
+            color: rgba(255, 255, 255, 0.7); /* Text color */
+            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transitions */
+            transition-duration: 300ms; /* Transition duration */
+            transition-property: color, background-color, box-shadow; /* Transition properties */
+            display: flex; /* Flexbox layout */
+            height: 32px; /* Fixed height */
+            align-items: center; /* Center items vertically */
+            box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px 1px 1px 0px; /* Box shadow */
+            outline: none; /* Remove outline */
+            justify-content: center; /* Center items horizontally */
+            min-width: 55px; /* Minimum width */
         }
+
+        /* Hover effect for the checkbox */
         .customCheckBox:hover {
-            background-color: #2c2c2c;
-            color: white;
-            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px;
+            background-color: #2c2c2c; /* Darker background on hover */
+            color: white; /* White text color on hover */
+            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px; /* Enhanced shadow */
         }
+
+        /* Inner text styling for the checkbox */
         .customCheckBox .inner {
-            font-size: 18px;
-            font-weight: 900;
-            pointer-events: none;
-            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
-            transition-duration: 300ms;
-            transition-property: transform;
-            transform: translateY(0px);
+            font-size: 18px; /* Font size */
+            font-weight: 900; /* Bold font */
+            pointer-events: none; /* Disable pointer events */
+            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transitions */
+            transition-duration: 300ms; /* Transition duration */
+            transition-property: transform; /* Transition transform */
+            transform: translateY(0px); /* Default position */
         }
+
+        /* Move text up slightly on hover */
         .customCheckBox:hover .inner {
             transform: translateY(-2px);
         }
+
+        /* Styling for the first checkbox in the group */
         .customCheckBoxWrapper:first-of-type .customCheckBox {
-            border-bottom-left-radius: 5px;
-            border-top-left-radius: 5px;
-            border-right: 0px;
+            border-bottom-left-radius: 5px; /* Rounded bottom-left corner */
+            border-top-left-radius: 5px; /* Rounded top-left corner */
+            border-right: 0px; /* No right border */
         }
+
+        /* Styling for the last checkbox in the group */
         .customCheckBoxWrapper:last-of-type .customCheckBox {
-            border-bottom-right-radius: 5px;
-            border-top-right-radius: 5px;
-            border-left: 0px;
+            border-bottom-right-radius: 5px; /* Rounded bottom-right corner */
+            border-top-right-radius: 5px; /* Rounded top-right corner */
+            border-left: 0px; /* No left border */
         }
+
+        /* Hide the default checkbox input */
         .customCheckBoxInput {
             display: none;
         }
+
+        /* Styling for the checked checkbox */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox {
-            background-color: #2d6737;
-            color: white;
-            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px;
+            background-color: #2d6737; /* Green background when checked */
+            color: white; /* White text color when checked */
+            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px; /* Enhanced shadow */
         }
+
+        /* Move text up slightly when checked */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox .inner {
             transform: translateY(-2px);
         }
+
+        /* Hover effect for checked checkbox */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox:hover {
-            background-color: #34723f;
-            box-shadow: rgba(0, 0, 0, 0.26) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.15) 0px 3px 6px 2px;
+            background-color: #34723f; /* Darker green background on hover */
+            box-shadow: rgba(0, 0, 0, 0.26) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.15) 0px 3px 6px 2px; /* Enhanced shadow */
         }
+
+        /* Move text up slightly when hovered and checked */
         .customCheckBoxWrapper .customCheckBox:hover .inner {
             transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
-    <canvas id="canvas3d"></canvas>
+    <canvas id="canvas3d"></canvas> <!-- 3D Canvas element -->
 
+    <!-- Custom cursor -->
     <div class="cursor">
+        <!-- Big cursor ball -->
         <div class="cursor__ball cursor__ball--big">
             <svg height="30" width="30">
-                <circle cx="15" cy="15" r="12" stroke-width="0"></circle>
+                <circle cx="15" cy="15" r="12" stroke-width="0"></circle> <!-- SVG Circle -->
             </svg>
         </div>
+        <!-- Small cursor ball -->
         <div class="cursor__ball cursor__ball--small">
             <svg height="10" width="10">
-                <circle cx="5" cy="5" r="4" stroke-width="0"></circle>
+                <circle cx="5" cy="5" r="4" stroke-width="0"></circle> <!-- SVG Circle -->
             </svg>
         </div>
     </div>
 
+    <!-- Background container -->
     <div class="container"></div>
 
+    <!-- GSAP library for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- Spline tool runtime for 3D scenes -->
     <script type="module" src="https://unpkg.com/@splinetool/runtime@0.9.5/dist/runtime.js"></script>
     <script type="module">
         import { Application } from '@splinetool/runtime';
 
+        // Initialize the 3D application
         const canvas = document.getElementById('canvas3d');
         const app = new Application(canvas);
-        app.load('https://prod.spline.design/gHOGvlwtYJ4E9Dth/scene.splinecode');
+        app.load('https://prod.spline.design/gHOGvlwtYJ4E9Dth/scene.splinecode'); // Load the 3D scene from Spline
     </script>
     <script>
-        const $bigBall = document.querySelector('.cursor__ball--big');
-        const $smallBall = document.querySelector('.cursor__ball--small');
-        const $cursor = document.querySelector('.cursor');
-        const $container = document.querySelector('.container');
+        const $bigBall = document.querySelector('.cursor__ball--big'); // Big cursor ball
+        const $smallBall = document.querySelector('.cursor__ball--small'); // Small cursor ball
+        const $cursor = document.querySelector('.cursor'); // Cursor element
+        const $container = document.querySelector('.container'); // Background container
 
         let hideCursorTimeout;
 
-        // Move the cursor
+        // Move the cursor based on mouse movement
         function onMouseMove(e) {
-            gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 });
-            gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 });
-            showCursor();
+            gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 }); // Move big ball
+            gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 }); // Move small ball
+            showCursor(); // Show the cursor when moving
 
-            // Parallax effect
+            // Parallax effect for the background
             const mouseX = e.clientX / window.innerWidth;
             const mouseY = e.clientY / window.innerHeight;
             gsap.to($container, {
@@ -206,37 +258,39 @@
 
         // Show the cursor
         function showCursor() {
-            $cursor.classList.remove('hidden');
-            clearTimeout(hideCursorTimeout);
-            hideCursorTimeout = setTimeout(hideCursor, 1000); // Hide after 1 second of inactivity
+            $cursor.classList.remove('hidden'); // Remove hidden class
+            clearTimeout(hideCursorTimeout); // Clear any previous timeout
+            hideCursorTimeout = setTimeout(hideCursor, 1000); // Set timeout to hide cursor after 1 second of inactivity
         }
 
         // Hide the cursor
         function hideCursor() {
-            $cursor.classList.add('hidden');
+            $cursor.classList.add('hidden'); // Add hidden class
         }
 
-        // Initialize cursor
+        // Initialize the custom cursor
         function initCursor() {
-            document.body.addEventListener('mousemove', onMouseMove);
+            document.body.addEventListener('mousemove', onMouseMove); // Listen for mouse movement
         }
 
         // Ensure cursor setup runs after page load
         window.addEventListener('load', () => {
-            initCursor();
-            $container.classList.add('loaded');
-            $cursor.classList.add('loaded');
+            initCursor(); // Initialize cursor
+            $container.classList.add('loaded'); // Mark container as loaded
+            $cursor.classList.add('loaded'); // Mark cursor as loaded
         });
     </script>
+    <!-- Spline viewer for embedding 3D scenes -->
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.5/build/spline-viewer.js"></script>
+    <!-- Embedding the Spline 3D scene -->
     <spline-viewer loading-anim-type="spinner-big-dark" url="https://prod.spline.design/gHOGvlwtYJ4E9Dth/scene.splinecode"></spline-viewer>
 
     <!-- Custom Toggle Switch -->
     <div class="customCheckBoxHolder">
-        <input type="checkbox" id="cCB1" class="customCheckBoxInput">
+        <input type="checkbox" id="cCB1" class="customCheckBoxInput"> <!-- Custom checkbox input -->
         <label for="cCB1" class="customCheckBoxWrapper">
             <div class="customCheckBox">
-                <div class="inner">Toggle Me</div>
+                <div class="inner">Toggle Me</div> <!-- Inner text for the checkbox -->
             </div>
         </label>
     </div>
