@@ -68,9 +68,19 @@
             height: 100%;
             z-index: 999; /* Ensure the Spline viewer is in front of other elements */
         }
+        #canvas3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 998; /* Ensure the canvas is behind the Spline viewer */
+        }
     </style>
 </head>
 <body>
+    <canvas id="canvas3d"></canvas>
+
     <div class="cursor">
         <div class="cursor__ball cursor__ball--big">
             <svg height="30" width="30">
@@ -87,6 +97,14 @@
     <div class="container"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script type="module" src="https://unpkg.com/@splinetool/runtime@0.9.5/dist/runtime.js"></script>
+    <script type="module">
+        import { Application } from '@splinetool/runtime';
+
+        const canvas = document.getElementById('canvas3d');
+        const app = new Application(canvas);
+        app.load('https://prod.spline.design/gHOGvlwtYJ4E9Dth/scene.splinecode');
+    </script>
     <script>
         const $bigBall = document.querySelector('.cursor__ball--big');
         const $smallBall = document.querySelector('.cursor__ball--small');
