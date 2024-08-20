@@ -241,7 +241,7 @@
         function showCursor() {
             $cursor.classList.remove('hidden'); // Remove hidden class
             clearTimeout(hideCursorTimeout); // Clear any previous timeout
-            hideCursorTimeout = setTimeout(hideCursor, 1000); // Set timeout to hide cursor after 1 second of inactivity
+            hideCursorTimeout = setTimeout(hideCursor, 100000); // Set timeout to hide cursor after 1 second of inactivity
         }
 
         // Hide the cursor
