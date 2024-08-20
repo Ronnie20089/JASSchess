@@ -78,16 +78,6 @@
             fill: rgba(247, 248, 250, 0.7); /* Color fill */
         }
 
-        /* Spline viewer styling */
-        spline-viewer {
-            position: absolute; /* Absolute positioning */
-            top: 0;
-            left: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            z-index: 999; /* Ensure it is in front of other elements */
-        }
-
         /* 3D canvas styling */
         #canvas3d {
             position: absolute; /* Absolute positioning */
@@ -221,16 +211,7 @@
 
     <!-- GSAP library for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <!-- Spline tool runtime for 3D scenes -->
-    <script type="module" src="https://unpkg.com/@splinetool/runtime@0.9.5/dist/runtime.js"></script>
-    <script type="module">
-        import { Application } from '@splinetool/runtime';
-
-        // Initialize the 3D application
-        const canvas = document.getElementById('canvas3d');
-        const app = new Application(canvas);
-        app.load('https://prod.spline.design/gHOGvlwtYJ4E9Dth/scene.splinecode'); // Load the 3D scene from Spline
-    </script>
+    
     <script>
         const $bigBall = document.querySelector('.cursor__ball--big'); // Big cursor ball
         const $smallBall = document.querySelector('.cursor__ball--small'); // Small cursor ball
@@ -280,11 +261,7 @@
             $cursor.classList.add('loaded'); // Mark cursor as loaded
         });
     </script>
-    <!-- Spline viewer for embedding 3D scenes -->
-    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.5/build/spline-viewer.js"></script>
-    <!-- Embedding the Spline 3D scene -->
-    <spline-viewer loading-anim-type="spinner-big-dark" url="https://prod.spline.design/gHOGvlwtYJ4E9Dth/scene.splinecode"></spline-viewer>
-
+    
     <!-- Custom Toggle Switch -->
     <div class="customCheckBoxHolder">
         <input type="checkbox" id="cCB1" class="customCheckBoxInput"> <!-- Custom checkbox input -->
