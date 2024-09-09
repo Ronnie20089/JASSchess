@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JASS-Chess</title>
-    <link rel="icon" href="ChessLogo.webp" type="image/png"> <!-- Favicon for the webpage -->
+    <title>JASS Chess</title>
+    <link rel="icon" href="ChessLogo.webp" type="image/png">
     <style>
-        /* Basic styles for the body */
+        /* Body styling to center content and set background */
         body {
             height: 100vh; /* Full viewport height */
             margin: 0; /* Remove default margin */
@@ -21,16 +21,38 @@
             overflow: hidden; /* Prevent scrollbars */
         }
 
-        /* Container styling */
+        /* Background styling */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #171717;
+            background-image: radial-gradient(rgba(52, 52, 52, 0.301) 2px, transparent 0);
+            background-size: 30px 30px;
+            background-position: 0 0;
+            pointer-events: none; /* Prevent interaction */
+            z-index: -1; /* Send it to the back */
+            transition: filter 1s; /* Transition for unblurring */
+            filter: blur(5px); /* Initial blur effect */
+        }
+
+        /* Remove blur when the page has loaded */
+        .background.loaded {
+            filter: blur(0);
+        }
+
+        /* Container for centering content */
         .container {
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            background-color: #171717; /* Background color */
-            background-image: radial-gradient(rgba(52, 52, 52, 0.301) 2px, transparent 0); /* Radial gradient background */
-            background-size: 30px 30px; /* Size of the gradient */
-            background-position: -5px -5px; /* Position the gradient */
-            position: relative; /* Positioning for other elements */
-            transition: filter 1.5s; /* Smooth transition for unblurring */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: filter 1.5s; /* Transition for unblurring */
             filter: blur(5px); /* Initial blur effect */
         }
 
@@ -39,104 +61,104 @@
             filter: blur(0);
         }
 
-        /* Cursor styling */
-        .cursor {
-            pointer-events: none; /* Disable pointer events */
-            position: absolute; /* Absolute positioning */
-            top: 0;
-            left: 0;
-            mix-blend-mode: difference; /* Blend mode for cursor effect */
-            z-index: 1000; /* Ensure it's on top */
-            transition: filter 1s; /* Transition for unblurring */
-            filter: blur(5px); /* Initial blur effect */
+        /* General text and link styling */
+        h1, p, a {
+            color: inherit;
         }
 
-        /* Hide the cursor when needed */
+        /* Link styling */
+        a {
+            border-bottom: 2px solid;
+            padding: 10px 0;
+            margin-top: 50px;
+            text-decoration: none; /* Remove underline */
+        }
+
+        /* Custom cursor styling */
+        .hoverable {
+            cursor: none; /* Hide default cursor */
+        }
+
+        /* Cursor container styling */
+        .cursor {
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            mix-blend-mode: difference;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+
+        /* Hide cursor when inactive */
         .cursor.hidden {
             opacity: 0;
         }
 
-        /* Remove blur when the page has loaded */
-        .cursor.loaded {
-            filter: blur(0);
-        }
-
-        /* Styling for the cursor balls */
+        /* Ball cursor styling */
         .cursor__ball {
-            position: fixed; /* Fixed position */
-            border-radius: 50%; /* Circular shape */
-            transform: translate(-50%, -50%); /* Center the balls */
+            position: fixed;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        /* Styling for the big cursor ball */
+        /* Big cursor ball styling */
         .cursor__ball--big svg circle {
-            fill: rgba(247, 248, 250, 0.7); /* Color fill */
+            fill: rgba(247, 248, 250, 0.7);
         }
 
-        /* Styling for the small cursor ball */
+        /* Small cursor ball styling */
         .cursor__ball--small svg circle {
-            fill: rgba(247, 248, 250, 0.7); /* Color fill */
-        }
-
-        /* 3D canvas styling */
-        #canvas3d {
-            position: absolute; /* Absolute positioning */
-            top: 0;
-            left: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            z-index: 998; /* Ensure it is behind the Spline viewer */
+            fill: rgba(247, 248, 250, 0.7);
         }
 
         /* Custom checkbox holder styling */
         .customCheckBoxHolder {
-            margin: 5px; /* Small margin */
-            display: flex; /* Flexbox layout */
-            position: absolute; /* Absolute positioning */
-            bottom: 20px; /* 20px from the bottom */
-            right: 20px; /* 20px from the right */
-            z-index: 1001; /* Ensure it's on top */
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
         }
 
-        /* Custom checkbox styling */
+        /* Custom checkbox button styling */
         .customCheckBox {
-            width: fit-content; /* Adjust width to content */
-            position: relative; /* Positioning for inner elements */
-            overflow: hidden; /* Hide overflow */
-            cursor: pointer; /* Pointer cursor */
-            user-select: none; /* Disable text selection */
-            padding: 2px 8px; /* Padding inside the checkbox */
-            background-color: rgba(0, 0, 0, 0.16); /* Background color */
-            border-radius: 0px; /* No border radius */
-            color: rgba(255, 255, 255, 0.7); /* Text color */
-            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transitions */
-            transition-duration: 300ms; /* Transition duration */
-            transition-property: color, background-color, box-shadow; /* Transition properties */
-            display: flex; /* Flexbox layout */
-            height: 32px; /* Fixed height */
-            align-items: center; /* Center items vertically */
-            box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px 1px 1px 0px; /* Box shadow */
-            outline: none; /* Remove outline */
-            justify-content: center; /* Center items horizontally */
-            min-width: 55px; /* Minimum width */
+            width: fit-content;
+            position: relative;
+            overflow: hidden;
+            cursor: none;
+            user-select: none;
+            padding: 2px 8px;
+            background-color: rgba(0, 0, 0, 0.16);
+            border-radius: 0px;
+            color: rgba(255, 255, 255, 0.7);
+            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition-duration: 300ms;
+            transition-property: color, background-color, box-shadow, transform;
+            display: flex;
+            height: 32px;
+            align-items: center;
+            box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px 1px 1px 0px;
+            outline: none;
+            justify-content: center;
+            min-width: 55px;
         }
 
-        /* Hover effect for the checkbox */
+        /* Custom checkbox hover effect */
         .customCheckBox:hover {
-            background-color: #2c2c2c; /* Darker background on hover */
-            color: white; /* White text color on hover */
-            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px; /* Enhanced shadow */
+            background-color: #2c2c2c;
+            color: white;
+            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px;
         }
 
-        /* Inner text styling for the checkbox */
+        /* Text inside the custom checkbox */
         .customCheckBox .inner {
-            font-size: 18px; /* Font size */
-            font-weight: 900; /* Bold font */
-            pointer-events: none; /* Disable pointer events */
-            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transitions */
-            transition-duration: 300ms; /* Transition duration */
-            transition-property: transform; /* Transition transform */
-            transform: translateY(0px); /* Default position */
+            font-size: 18px;
+            font-weight: 900;
+            pointer-events: none;
+            transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition-duration: 300ms;
+            transition-property: transform;
+            transform: translateY(0px);
         }
 
         /* Move text up slightly on hover */
@@ -144,30 +166,30 @@
             transform: translateY(-2px);
         }
 
-        /* Styling for the first checkbox in the group */
+        /* Adjust first and last custom checkbox wrappers */
         .customCheckBoxWrapper:first-of-type .customCheckBox {
-            border-bottom-left-radius: 5px; /* Rounded bottom-left corner */
-            border-top-left-radius: 5px; /* Rounded top-left corner */
-            border-right: 0px; /* No right border */
+            border-bottom-left-radius: 5px;
+            border-top-left-radius: 5px;
+            border-right: 0px;
         }
 
-        /* Styling for the last checkbox in the group */
         .customCheckBoxWrapper:last-of-type .customCheckBox {
-            border-bottom-right-radius: 5px; /* Rounded bottom-right corner */
-            border-top-right-radius: 5px; /* Rounded top-right corner */
-            border-left: 0px; /* No left border */
+            border-bottom-right-radius: 5px;
+            border-top-right-radius: 5px;
+            border-left: 0px;
         }
 
-        /* Hide the default checkbox input */
+        /* Hide default checkbox input */
         .customCheckBoxInput {
             display: none;
         }
 
-        /* Styling for the checked checkbox */
+        /* Checked checkbox styling */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox {
-            background-color: #2d6737; /* Green background when checked */
-            color: white; /* White text color when checked */
-            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px; /* Enhanced shadow */
+            background-color: #2d6737;
+            color: white;
+            box-shadow: rgba(0, 0, 0, 0.23) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.17) 0px 2px 4px 1px;
+            transform: none; /* Remove scale effect */
         }
 
         /* Move text up slightly when checked */
@@ -175,61 +197,85 @@
             transform: translateY(-2px);
         }
 
-        /* Hover effect for checked checkbox */
+        /* Checked checkbox hover effect */
         .customCheckBoxInput:checked + .customCheckBoxWrapper .customCheckBox:hover {
-            background-color: #34723f; /* Darker green background on hover */
-            box-shadow: rgba(0, 0, 0, 0.26) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.15) 0px 3px 6px 2px; /* Enhanced shadow */
+            background-color: #34723f;
+            box-shadow: rgba(0, 0, 0, 0.26) 0px -4px 1px 0px inset, rgba(255, 255, 255, 0.17) 0px -1px 1px 0px, rgba(0, 0, 0, 0.15) 0px 3px 6px 2px;
         }
 
-        /* Move text up slightly when hovered and checked */
+        /* Move text up slightly on hover when checked */
         .customCheckBoxWrapper .customCheckBox:hover .inner {
             transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
-    <canvas id="canvas3d"></canvas> <!-- 3D Canvas element -->
-
-    <!-- Custom cursor -->
+    <!-- Custom cursor markup -->
     <div class="cursor">
         <!-- Big cursor ball -->
         <div class="cursor__ball cursor__ball--big">
             <svg height="30" width="30">
-                <circle cx="15" cy="15" r="12" stroke-width="0"></circle> <!-- SVG Circle -->
+                <circle cx="15" cy="15" r="12" stroke-width="0"></circle>
             </svg>
         </div>
         <!-- Small cursor ball -->
         <div class="cursor__ball cursor__ball--small">
             <svg height="10" width="10">
-                <circle cx="5" cy="5" r="4" stroke-width="0"></circle> <!-- SVG Circle -->
+                <circle cx="5" cy="5" r="4" stroke-width="0"></circle>
             </svg>
         </div>
     </div>
 
-    <!-- Background container -->
-    <div class="container"></div>
+    <!-- Background element -->
+    <div class="background"></div>
 
-    <!-- GSAP library for animations -->
+    <!-- Main container for centered content -->
+    <div class="container">
+                    
+        <!-- Custom Checkbox HTML -->
+        <div class="customCheckBoxHolder">
+            <input type="checkbox" id="cCB1" class="customCheckBoxInput">
+            <label for="cCB1" class="customCheckBoxWrapper">
+                <div class="customCheckBox">
+                    <div class="inner"> Classroom </div>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <!-- GSAP animation library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    
     <script>
-        const $bigBall = document.querySelector('.cursor__ball--big'); // Big cursor ball
-        const $smallBall = document.querySelector('.cursor__ball--small'); // Small cursor ball
-        const $cursor = document.querySelector('.cursor'); // Cursor element
-        const $container = document.querySelector('.container'); // Background container
+        // Select cursor elements
+        const $bigBall = document.querySelector('.cursor__ball--big');
+        const $smallBall = document.querySelector('.cursor__ball--small');
+        const $cursor = document.querySelector('.cursor');
+        const $hoverables = document.querySelectorAll('.hoverable');
+        const $checkbox = document.querySelector('#cCB1'); // Get the checkbox element
+        const $container = document.querySelector('.container'); // Get the container element
+        const $background = document.querySelector('.background'); // Get the background element
 
         let hideCursorTimeout;
 
-        // Move the cursor based on mouse movement
-        function onMouseMove(e) {
-            gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 }); // Move big ball
-            gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 }); // Move small ball
-            showCursor(); // Show the cursor when moving
+        // Event listeners for cursor and hover effects
+        document.body.addEventListener('mousemove', onMouseMove);
+        $hoverables.forEach(element => {
+            element.addEventListener('mouseenter', onMouseHover);
+            element.addEventListener('mouseleave', onMouseHoverOut);
+            element.addEventListener('mousedown', onMouseDown);
+        });
+        $checkbox.addEventListener('change', onCheckboxChange); // Add event listener for checkbox
 
-            // Parallax effect for the background
+        // Move the cursor based on mouse position
+        function onMouseMove(e) {
+            gsap.to($bigBall, { duration: 0.4, x: e.pageX - 15, y: e.pageY - 15 });
+            gsap.to($smallBall, { duration: 0.1, x: e.pageX - 5, y: e.pageY - 7 });
+            showCursor();
+
+            // Parallax effect for background
             const mouseX = e.clientX / window.innerWidth;
             const mouseY = e.clientY / window.innerHeight;
-            gsap.to($container, {
+            gsap.to($background, {
                 duration: 0.5,
                 x: (mouseX - 0.5) * 5,
                 y: (mouseY - 0.5) * 5,
@@ -239,37 +285,45 @@
 
         // Show the cursor
         function showCursor() {
-            $cursor.classList.remove('hidden'); // Remove hidden class
-            clearTimeout(hideCursorTimeout); // Clear any previous timeout
-            hideCursorTimeout = setTimeout(hideCursor, 100000); // Set timeout to hide cursor after 1 second of inactivity
+            $cursor.classList.remove('hidden');
+            clearTimeout(hideCursorTimeout);
+            hideCursorTimeout = setTimeout(hideCursor, 1000); // Hide after 1 second of inactivity
         }
 
         // Hide the cursor
         function hideCursor() {
-            $cursor.classList.add('hidden'); // Add hidden class
+            $cursor.classList.add('hidden');
         }
 
-        // Initialize the custom cursor
-        function initCursor() {
-            document.body.addEventListener('mousemove', onMouseMove); // Listen for mouse movement
+        // Hover effect for elements
+        function onMouseHover() {
+            gsap.to($bigBall, { duration: 0.3, scale: 4 });
         }
 
-        // Ensure cursor setup runs after page load
+        // Reset cursor on hover out
+        function onMouseHoverOut() {
+            gsap.to($bigBall, { duration: 0.3, scale: 1 });
+        }
+
+        // Click effect for hoverable elements
+        function onMouseDown() {
+            gsap.to($bigBall, { duration: 0.3, scale: 2 });
+        }
+
+        // Checkbox change event
+        function onCheckboxChange(e) {
+            if (e.target.checked) {
+                setTimeout(() => {
+                    window.open('https://classroom.google.com/', '_blank');
+                }, 500); // Delay for 0.5 seconds
+            }
+        }
+
+        // Remove blur effect when page has loaded
         window.addEventListener('load', () => {
-            initCursor(); // Initialize cursor
-            $container.classList.add('loaded'); // Mark container as loaded
-            $cursor.classList.add('loaded'); // Mark cursor as loaded
+            $container.classList.add('loaded');
+            $background.classList.add('loaded');
         });
     </script>
-    
-    <!-- Custom Toggle Switch -->
-    <div class="customCheckBoxHolder">
-        <input type="checkbox" id="cCB1" class="customCheckBoxInput"> <!-- Custom checkbox input -->
-        <label for="cCB1" class="customCheckBoxWrapper">
-            <div class="customCheckBox">
-                <div class="inner">Toggle Me</div> <!-- Inner text for the checkbox -->
-            </div>
-        </label>
-    </div>
 </body>
 </html>
